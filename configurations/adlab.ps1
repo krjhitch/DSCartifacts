@@ -46,7 +46,13 @@ configuration AddAdditionalDC {
             DomainName                    = $DomainName
             DomainAdministratorCredential = $DomainCreds
             SafemodeAdministratorPassword = $DomainCreds
-            DependsOn                     = "[WindowsFeature]ADDSInstall"
+            DependsOn                     = "[WindowsFeature]ADDSInstall","[xDSCDomainJoin]Join$Domain"
+        }
+
+        xDSCDomainJoin "Join$Domain" {
+            Domain     = $DomainName
+            Credential = $DomainCreds
+            DependsOn  = "[WindowsFeature]ADDSInstall"
         }
  
         LocalConfigurationManager {
