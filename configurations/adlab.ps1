@@ -33,7 +33,7 @@ configuration AddAdditionalDC {
         [Parameter(Mandatory)][String] $DomainName,
         [Parameter(Mandatory)][System.Management.Automation.PSCredential] $Admincreds
     ) 
-    Import-DscResource -ModuleName PSDesiredStateConfiguration, xActiveDirectory
+    Import-DscResource -ModuleName PSDesiredStateConfiguration, xActiveDirectory, xDSCDomainJoin
      
     [System.Management.Automation.PSCredential] $DomainCreds = New-Object System.Management.Automation.PSCredential ("${DomainName}\$($Admincreds.UserName)", $Admincreds.Password)
  

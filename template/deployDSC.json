@@ -1,0 +1,66 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "TargetVMName": {
+            "type": "string"
+        },
+        "DSCUserName": {
+            "type": "string"
+        },
+        "DSCPassword": {
+            "type": "securestring"
+        },
+        "DomainName": {
+            "type": "string"
+        },
+        "ModuleURL": {
+            "type": "string",
+            "defaultValue": "https://github.com/krjhitch/DSCartifacts/raw/master/packages/adlab.zip"
+        },
+        "PS1": {
+            "type": "string",
+            "defaultValue": "adlab.ps1"
+        },
+        "DSCfunction": {
+            "type": "string",
+            "allowedValues": [
+                "CreateFirstDC",
+                "AddAdditionalDC",
+                "JoinAD"
+            ]
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('TargetVMName'), '/DSC')]",
+            "apiVersion": "2017-03-30",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "publisher": "Microsoft.Powershell",
+                "type": "DSC",
+                "typeHandlerVersion": "2.19",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "ModulesUrl": "[parameters('ModuleURL')]",
+                    "ConfigurationFunction": "[concat(parameters('PS1'), '\\', parameters('DSCfunction'))]",
+                    "Properties": {
+                        "DomainName": "[parameters('DomainName')]",
+                        "AdminCreds": {
+                            "UserName": "[parameters('DSCUserName')]",
+                            "Password": "PrivateSettingsRef:AdminPassword"
+                        }
+                    }
+                },
+                "protectedSettings": {
+                    "Items": {
+                        "AdminPassword": "[parameters('DSCPassword')]"
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}
